@@ -1,29 +1,30 @@
-[tool.poetry]
+[project]
 name = "jinja-super-macros"
-version = "0.1.0"
+version = "0.2.0"
 description = "Improved macros for Jinja"
-authors = ["Maxime Bouroumeau-Fuseau <maxime.bouroumeau@gmail.com>"]
+authors = [
+    {"name" = "Maxime Bouroumeau-Fuseau", email = "maxime.bouroumeau@gmail.com"}
+]
 readme = "README.md"
 license = "MIT"
-repository = "https://github.com/hyperflask/jinja-super-macros"
-packages = [{include = "jinja_super_macros"}]
+requires-python = ">=3.10"
+dependencies = [
+    "jinja2 >=3.0.0,<4.0.0"
+]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-jinja2 = "^3.0.0"
+[project.urls]
+Repository = "https://github.com/hyperflask/jinja-super-macros"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.0.0"
-pytest-cov = "^4.1.0"
-ruff = "^0.4.3"
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "ruff>=0.12.4",
+]
 
 [tool.ruff]
-include = ["jinja_super_macros/**/*.py"]
 line-length = 100
 
-[tool.ruff.lint]
-exclude = ["jinja_super_macros/__init__.py"]
-
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.8.11,<0.9.0"]
+build-backend = "uv_build"
