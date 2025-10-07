@@ -74,8 +74,7 @@ class MacroTagsExtension(Extension):
             "name:call_local_macro_tag"
         )
         lineno = next(parser.stream).lineno
-        tag_name = parser.stream.current.value
-        next(parser.stream)
+        tag_name = next(parser.stream).value
 
         call_block_node = nodes.CallBlock()
         if is_block and parser.stream.current.test("lparen"):
@@ -142,29 +141,38 @@ class MacroTagsExtension(Extension):
             if not expr:
                 parser.fail("invalid syntax for macro tag expression", parser.stream.current.lineno)
 
+        # support dashes in names by converting them to underscores
+        name = None
         while parser.stream.current.type != "block_end":
             if parser.stream.current.type == "mul":
-                ensure(dyn_args is None and dyn_kwargs is None)
+                ensure(name is None and dyn_args is None and dyn_kwargs is None)
                 next(parser.stream)
                 dyn_args = parser.parse_expression()
             elif parser.stream.current.type == "pow":
-                ensure(dyn_kwargs is None)
+                ensure(name is None and dyn_kwargs is None)
                 next(parser.stream)
                 dyn_kwargs = parser.parse_expression()
-            else:
-                if parser.stream.current.type == "name" and parser.stream.look().type == "assign":
-                    ensure(dyn_kwargs is None)
-                    key = parser.stream.current.value
-                    parser.stream.skip(2)
-                    if parser.stream.skip_if("lparen"):
-                        value = parser.parse_expression()
-                        parser.stream.expect("rparen")
-                    else:
-                        value = parser.parse_unary()
-                    kwargs.append(nodes.Keyword(key, value, lineno=value.lineno))
+            elif parser.stream.current.type == "name" and parser.stream.look().type in ("assign", "sub"):
+                if not name:
+                    name = ""
+                name += next(parser.stream).value
+            elif parser.stream.current.type == "sub":
+                ensure(name is not None)
+                next(parser.stream)
+                name += "_"
+            elif parser.stream.current.type == "assign":
+                ensure(name is not None and dyn_kwargs is None)
+                next(parser.stream)
+                if parser.stream.skip_if("lparen"):
+                    value = parser.parse_expression()
+                    parser.stream.expect("rparen")
                 else:
-                    ensure(dyn_args is None and dyn_kwargs is None and not kwargs)
-                    args.append(parser.parse_unary())
+                    value = parser.parse_unary()
+                kwargs.append(nodes.Keyword(name, value, lineno=value.lineno))
+                name = None
+            else:
+                ensure(name is None and dyn_args is None and dyn_kwargs is None and not kwargs)
+                args.append(parser.parse_unary())
 
         return args, kwargs, dyn_args, dyn_kwargs
 

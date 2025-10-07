@@ -2,36 +2,21 @@
 
 Jinja Super Macros introduces a new syntax to call macros as well as an automatic macro loader.
 
-## Example
+```jinja
+{% macro Form(action) %}
+    <form action="{{ action }}" method="post">
+        {{ caller() }}
+    </form>
+{% endmacro %}
 
-In *app.py*:
+{% macro FormInput(name) %}
+    <input type="text" name="{{ name }}">
+{% endmacro %}
 
-    from jinja2 import Environment, PackageLoader
-    from jinja_super_macros import configure_environment
-
-    env = Environment(loader=PackageLoader(__name__, 'templates'))
-    configure_environment(env)
-    env.macros.register_file('macros.html')
-
-    print env.get_template('form.html').render()
-
-In *macros.html*:
-
-    {% macro Form(action) %}
-        <form action="{{ action }}" method="post">
-            {{ caller() }}
-        </form>
-    {% endmacro %}
-
-    {% macro FormInput(name) %}
-        <input type="text" name="{{ name }}">
-    {% endmacro %}
-
-In *templates/form.html*:
-
-    <{Form action="/" }>
-        <{FormInput name="email" }/>
-    </{Form}>
+<{Form action="/" }>
+    <{FormInput name="email" }/>
+</{Form}>
+```
 
 ## Installation
 
@@ -42,13 +27,15 @@ In *templates/form.html*:
 To start using super macros, configure the environment with additional
 extensions and settings and register your macros:
 
-    from jinja2 import Environment, PackageLoader
-    from jinja_super_macros import configure_environment
+```py
+from jinja2 import Environment, PackageLoader
+from jinja_super_macros import configure_environment
 
-    env = Environment(loader=PackageLoader(__name__, 'templates'))
-    configure_environment(env)
+env = Environment(loader=PackageLoader(__name__, 'templates'))
+configure_environment(env)
 
-    env.macros.register_from_template("macros.html")
+env.macros.register_from_template("macros.html")
+```
 
 You can register macros from templates available through your loader:
 
@@ -56,7 +43,7 @@ You can register macros from templates available through your loader:
  - `register(name, template)`: register the specified macro located in the template
  - `register_from_env()`: look for macros in all templates:
     - by default, only look in templates named `__macros__.html`
-    - pass `filter_func=False` to register fromm ALL templates
+    - pass `filter_func=False` to register from ALL templates
     - provide a custom `filter_func` (will receive the template name as argument)
 
 You can also register macros using templates not accessible from your environment loader:
@@ -78,11 +65,11 @@ Jinja expressions.
 
 Inline tag example:
 
-    <{macro_name arg1=value1 arg2=value2 }/>
+    <{macro_name arg1=value1 arg2=value2 arg-with-dashes=value3 }/>
 
 is equivalent to:
 
-    {{ macro_name(arg1=value1, arg2=value2) }}
+    {{ macro_name(arg1=value1, arg2=value2, arg_with_dashes=value3) }}
 
 Block tags, start with an opening directive enclosed in `<{` and `}>`
 and must be closed with a closing directive `</{macro_name}>` (note
@@ -102,7 +89,7 @@ is equivalent to:
 
 The list of attributes acts almost the same as a function call but with spaces instead of comma. This means that values can be single expressions with no operators or a full expression enclosed in parentheses.
 
-    <{macro_name arg1 arg2 kw_arg1=single_value kw_arg2=("a" if True else "b") **kwargs }/>
+    <{macro_name arg1 arg2 kw-arg1=single_value kw-arg2=("a" if True else "b") **kwargs }/>
 
 By default, when a macro tag is used but no macro is found matching the name,
 it will fallback to rendering the html tag:
