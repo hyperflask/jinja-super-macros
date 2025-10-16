@@ -60,7 +60,7 @@ Inline is the equivalent of calling the macro using `{{ macro_name() }}`
 and block is equivalent to the `{% call %}` directive.
 
 Inline directives are enclosed in `<{` and `}/>`. Arguments
-can be provided the same was as html attributes but their values are
+can be provided the same way as html attributes but their values are
 Jinja expressions.
 
 Inline tag example:
@@ -71,7 +71,7 @@ is equivalent to:
 
     {{ macro_name(arg1=value1, arg2=value2, arg_with_dashes=value3) }}
 
-Block tags, start with an opening directive enclosed in `<{` and `}>`
+Block tags start with an opening directive enclosed in `<{` and `}>`
 and must be closed with a closing directive `</{macro_name}>` (note
 that the macro name is optional in the closing directive).
 
@@ -87,18 +87,18 @@ is equivalent to:
         my macro content
     {% endcall %}
 
-The list of attributes acts almost the same as a function call but with spaces instead of comma. This means that values can be single expressions with no operators or a full expression enclosed in parentheses.
+The list of attributes acts almost the same as a function call but with spaces instead of commas. This means that values can be single expressions with no operators or a full expression enclosed in parentheses.
 
     <{macro_name arg1 arg2 kw-arg1=single_value kw-arg2=("a" if True else "b") **kwargs }/>
 
 By default, when a macro tag is used but no macro is found matching the name,
-it will fallback to rendering the html tag:
+it will fall back to rendering the html tag:
 
     <{input type="checkbox" checked=is_checked() }/>
 
 ## New ways to define macros
 
-Jinja Super Macros registry's also gives you the possibility to create macros from new sources.
+Jinja Super Macros registries also gives you the possibility to create macros from new sources.
 
 - `create_from_file(filename)`: wrap the content of the file in a macro directive and register it
 - `create_from_directory(path)`: create macros from all files in the directory (recursively):
